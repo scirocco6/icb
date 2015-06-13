@@ -1,31 +1,11 @@
 package icb
 
-import (
-    "bytes"
-    "net"
-    "fmt"
-)
-
-type IcbPacket struct {
-    Buffer bytes.Buffer
-}
-
-func (packet *IcbPacket) Init (kind []byte, parameters []string) { 	
-    packet.Buffer.Write(kind)
-    packet.packParameters(parameters)
-}
-
 func (packet *IcbPacket) packParameters (parameters []string) {
     for _, parameter := range parameters {        
 		packet.Buffer.WriteString(parameter)
 		packet.Buffer.WriteByte(1)
 	}
 	packet.Buffer.Truncate(packet.Buffer.Len() - 1) // remove the excess seperator
-}
-
-func (packet *IcbPacket) SendTo (connection net.Conn) {
-    connection.Write([]byte{byte(packet.Buffer.Len())})
-    connection.Write(packet.Buffer.Bytes())
 }
 
 func CreatePacket(kind string, parameters ...string)(IcbPacket) { 
@@ -51,9 +31,3 @@ func CreatePacket(kind string, parameters ...string)(IcbPacket) {
 	
 	return packet
 }
-
-func Connection(host, port string)(net.Conn, error) {
-    address := fmt.Sprintf("%s:%s", host, port)
-    return net.Dial("tcp", address)
-}
-
