@@ -22,7 +22,7 @@ func CreatePacket(kind string, parameters ...string)(IcbPacket) {
 	    
 	    case "join": {packet.Init([]byte{'h'}, []string{"g", parameters[0]})}
 	    
-	    case "global_who": {packet.Init([]byte{'h'}, []string{"w\001", parameters[0]})}
+	    case "global_who": {packet.Init([]byte{'h'}, []string{"w\001"})}
 	    
 	    case "local_who": {packet.Init([]byte{'h'}, append([]string{"w"}, parameters...))}
 	    
