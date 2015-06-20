@@ -119,7 +119,7 @@ func (packet *Packet) commandOutput() string {
 
 	case "wh":
 		{ // output the who header
-			return "   Nickname          Idle       Sign-On        Account"
+			return "Nickname          Idle               Sign-On              Account"
 		}
 
 	case "wl":
@@ -133,12 +133,11 @@ func (packet *Packet) commandOutput() string {
 func (packet *Packet) whoItem() string {
 	// kind, _  := packet.nextParameter()
 	_ = packet.nextParameter()
-	flag := packet.nextParameter()
+	flag := packet.nextParameter() // moderator flag
 	nick := packet.nextParameter()
 	idle := packet.nextParameter()
-	// respc, _ := packet.nextParameter()
-	_ = packet.nextParameter()
-	_ = packet.nextParameter()
+	_ = packet.nextParameter() // responce time, obsolete
+	login := packet.nextParameter()
 	user := packet.nextParameter()
 	host := packet.nextParameter()
 
@@ -147,10 +146,34 @@ func (packet *Packet) whoItem() string {
 		flag = "*"
 	}
 
-	i, _ := strconv.Atoi(idle)
-	idleTime := time.Duration(i) * time.Second
+	idleTime := stringFromIdleSeconds(idle)
+	loginTime := stringForLoginDate(login)
 
-	return fmt.Sprintf("%s %s %s %s", flag, nick, idleTime.String(), account)
+	return fmt.Sprintf("%s %-12s %-16s\t%-15s    %s", flag, nick, idleTime, loginTime, account)
+}
+
+func stringForLoginDate(login string) string {
+	i, _ := strconv.ParseInt(login, 10, 64)
+	const loginFormat = "Jan 02, 03:04pm"
+
+	return time.Unix(i, 0).Format(loginFormat)
+}
+
+func stringFromIdleSeconds(idle string) string {
+	seconds, _ := strconv.ParseInt(idle, 10, 64)
+
+	// golang Time doesn't handle days so we have to do it ourselves
+	days := seconds / (24 * 60 * 60)
+	seconds -= days * 24 * 60 * 60
+
+	idleString := ""
+	if days > 0 {
+		idleString += strconv.FormatInt(days, 10) + "d"
+	}
+	idleTime := time.Duration(seconds) * time.Second
+	idleString += idleTime.String()
+
+	return idleString
 }
 
 func (packet *Packet) nextParameter() string {
