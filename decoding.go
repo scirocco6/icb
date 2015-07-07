@@ -13,13 +13,9 @@ func (packet *Packet) Decode() string {
 	kind, _ := packet.Buffer.ReadByte()
 
 	switch string(kind) {
-	case "1":
+	case "a": // login sucessful
 		{
-			return packet.serverID()
-		}
-	case "a":
-		{
-			return packet.loginResult()
+			return ""
 		}
 	case "b":
 		{
@@ -53,17 +49,13 @@ func (packet *Packet) Decode() string {
 		{
 			return packet.beep()
 		}
+	case "n": // nop packet
+		{
+			return ""
+		}
 	}
 
 	return ""
-}
-
-func (packet *Packet) serverID() string {
-	return fmt.Sprintf("[=Login=] %s", packet.Buffer.String())
-}
-
-func (packet *Packet) loginResult() string {
-	return fmt.Sprintf("[=Login=] %s", packet.Buffer.String())
 }
 
 func (packet *Packet) publicMessage() string {
@@ -112,22 +104,21 @@ func (packet *Packet) commandOutput() string {
 			return packet.Buffer.String()
 		}
 
-	case "ec":
-		{ // end of output terminator in theory there should never be any actual message from this
+	case "ec": // end of output terminator in theory there should never be any actual message from this
+		{
 			return packet.Buffer.String()
 		}
-
-	case "wh":
-		{ // output the who header
+	case "wh": // output the who header
+		{
 			return "Nickname          Idle               Sign-On              Account"
 		}
 
-	case "wl":
-		{ // item in a who listing
+	case "wl": // item in a who listing
+		{
 			return packet.whoItem()
 		}
 	}
-	return fmt.Sprintf("%%ERROR unknown packet of type %q\n", kind)
+	return fmt.Sprintf("%%ERROR unknown command output packet of type %q\n", kind)
 }
 
 func (packet *Packet) whoItem() string {
