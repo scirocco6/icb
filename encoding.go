@@ -1,7 +1,7 @@
 package icb
 
 // CreatePacket is the primary way to make icb packets for transmission
-func CreatePacket(kind string, parameters ...string) Packet {
+func CreatePacket(kind string, parameters ...string) *Packet {
 	var packet Packet
 
 	switch kind {
@@ -38,5 +38,5 @@ func CreatePacket(kind string, parameters ...string) Packet {
 			packet.Init([]byte{'n'}, parameters)
 		}
 	}
-	return packet
+	return &packet
 }
