@@ -1,10 +1,6 @@
 package icb
 
-import (
-	"bytes"
-	"fmt"
-	"net"
-)
+import "bytes"
 
 // Packet holds raw icb packets
 type Packet struct {
@@ -31,14 +27,8 @@ func (packet *Packet) Write(p []byte) (n int, err error) {
 	return packet.Buffer.Write(p)
 }
 
-// SendTo writes the packet buffer to the supplied connection
-func (packet *Packet) SendTo(connection net.Conn) {
-	connection.Write([]byte{byte(packet.Buffer.Len())})
-	connection.Write(packet.Buffer.Bytes())
-}
-
-// Connect connects to the icb host and port provided, returns a net.Conn and error
-func Connect(host, port string) (net.Conn, error) {
-	address := fmt.Sprintf("%s:%s", host, port)
-	return net.Dial("tcp", address)
+// Send writes the packet buffer to the supplied connection
+func (packet *Packet) Send() {
+	Connection.Write([]byte{byte(packet.Buffer.Len())})
+	Connection.Write(packet.Buffer.Bytes())
 }
